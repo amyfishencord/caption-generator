@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Caption Press</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=IBM+Plex+Mono:wght@400;500&family=Work+Sans:wght@400;500;600&display=swap');
+
+:root{
+  --paper: #F6F1E7;
+  --ink: #221B15;
+  --plum: #6B1E3C;
+  --mustard: #C98A2C;
+  --line: #D9CFBC;
+  --card: #FFFDF8;
+}
+
+*{box-sizing:border-box; margin:0; padding:0;}
+
+body{
+  background: var(--paper);
+  color: var(--ink);
+  font-family: 'Work Sans', sans-serif;
+  min-height: 100vh;
+  padding: 48px 24px 80px;
+}
+
+.wrap{
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+header{
+  border-bottom: 3px solid var(--ink);
+  padding-bottom: 18px;
+  margin-bottom: 36px;
+  display:flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.masthead{
+  font-family:'Fraunces', serif;
+  font-weight: 700;
+  font-size: clamp(2.2rem, 6vw, 3.2rem);
+  letter-spacing: -0.01em;
+  line-height: 0.95;
+}
+
+.masthead em{
+  font-style: italic;
+  color: var(--plum);
+}
+
+.kicker{
+  font-family:'IBM Plex Mono', monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--plum);
+  margin-bottom: 6px;
+  display:block;
+}
+
+.dateline{
+  font-family:'IBM Plex Mono', monospace;
+  font-size: 0.72rem;
+  color: #7a7060;
+  text-align:right;
+}
+
+.setup-note{
+  font-family:'IBM Plex Mono', monospace;
+  font-size: 0.78rem;
+  color: #7a7060;
+  border-left: 2px solid var(--line);
+  padding-left: 12px;
+  margin-bottom: 32px;
+  line-height: 1.5;
+}
+.setup-note a{ color: var(--plum); }
+
+form{
+  display:flex;
+  flex-direction:column;
+  gap: 22px;
+  margin-bottom: 40px;
+}
+
+label{
+  font-family:'IBM Plex Mono', monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink);
+  display:block;
+  margin-bottom: 8px;
+}
+
+input[type=text], input[type=password]{
+  width: 100%;
+  border: none;
+  border-bottom: 2px solid var(--ink);
+  background: transparent;
+  font-family:'Fraunces', serif;
+  font-size: 1.15rem;
+  padding: 8px 2px;
+  color: var(--ink);
+  outline: none;
+  transition: border-color .15s ease;
+}
+input[type=text]:focus, input[type=password]:focus{
+  border-color: var(--plum);
+}
+input::placeholder{ color: #b6ab93; font-style: italic; }
+
+.row{
+  display:flex;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+.row > div{ flex:1; min-width: 180px; }
+
+select{
+  width:100%;
+  border: 2px solid var(--ink);
+  background: var(--card);
+  font-family: 'Work Sans', sans-serif;
+  font-size: 0.95rem;
+  padding: 10px 12px;
+  color: var(--ink);
+  cursor:pointer;
+}
+
+.count-row{
+  display:flex;
+  align-items:center;
+  gap: 14px;
+}
+input[type=range]{
+  flex:1;
+  accent-color: var(--plum);
+}
+.count-val{
+  font-family:'IBM Plex Mono', monospace;
+  font-weight:500;
+  min-width: 20px;
+  text-align:center;
+}
+
+button.run{
+  align-self: flex-start;
+  background: var(--ink);
+  color: var(--paper);
+  border: none;
+  font-family:'IBM Plex Mono', monospace;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-size: 0.82rem;
+  padding: 14px 28px;
+  cursor:pointer;
+  transition: background .15s ease, transform .1s ease;
+}
+button.run:hover{ background: var(--plum); }
+button.run:active{ transform: translateY(1px); }
+button.run:disabled{ background:#b6ab93; cursor:not-allowed; }
+
+.error{
+  font-family:'IBM Plex Mono', monospace;
+  font-size: 0.82rem;
+  color: var(--plum);
+  border: 1px solid var(--plum);
+  padding: 12px 14px;
+  margin-bottom: 24px;
+  display:none;
+}
+
+.results{ display:flex; flex-direction:column; gap: 16px; }
+
+.card{
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--mustard);
+  padding: 18px 20px;
+  position: relative;
+  animation: rise .35s ease both;
+}
+@keyframes rise{
+  from{ opacity:0; transform: translateY(6px); }
+  to{ opacity:1; transform: translateY(0); }
+}
+
+.card .idx{
+  font-family:'IBM Plex Mono', monospace;
+  font-size: 0.68rem;
+  color: var(--mustard);
+  letter-spacing: 0.1em;
+  margin-bottom: 8px;
+  display:block;
+}
+
+.card p{
+  font-family:'Fraunces', serif;
+  font-size: 1.05rem;
+  line-height: 1.5;
+  margin-bottom: 12px;
+}
+
+.card-foot{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  font-family:'IBM Plex Mono', monospace;
+  font-size: 0.72rem;
+  color: #7a7060;
+}
+
+.copy-btn{
+  background:none;
+  border: 1px solid var(--ink);
+  font-family:'IBM Plex Mono', monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 5px 10px;
+  cursor:pointer;
+  color: var(--ink);
+}
+.copy-btn:hover{ background: var(--ink); color: var(--paper); }
+.copy-btn.copied{ background: var(--plum); border-color: var(--plum); color: var(--paper); }
+
+.empty{
+  font-family:'IBM Plex Mono', monospace;
+  font-size: 0.85rem;
+  color: #a89d86;
+  border: 1px dashed var(--line);
+  padding: 28px;
+  text-align:center;
+}
+
+.loading{
+  font-family:'IBM Plex Mono', monospace;
+  font-size: 0.85rem;
+  color: var(--plum);
+  padding: 10px 0;
+  display:none;
+}
+
+@media (max-width: 520px){
+  header{ flex-direction:column; align-items:flex-start; }
+  .dateline{ text-align:left; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div>
+      <span class="kicker">Vol. 1 — No. 1</span>
+      <div class="masthead">Caption <em>Press</em></div>
+    </div>
+    <div class="dateline">Marketing captions,<br>on demand</div>
+  </header>
+
+  <div class="setup-note">
+    Paste a Gemini API key to run this (free at <a href="https://aistudio.google.com/app/apikey" target="_blank">aistudio.google.com/app/apikey</a>). The key stays in this browser tab only — it's never saved or sent anywhere but Google.
+  </div>
+
+  <form id="genForm">
+    <div>
+      <label for="apiKey">Gemini API key</label>
+      <input type="password" id="apiKey" placeholder="AIza...">
+    </div>
+
+    <div>
+      <label for="product">Product or service</label>
+      <input type="text" id="product" placeholder="e.g. a cold brew coffee subscription" required>
+    </div>
+
+    <div class="row">
+      <div>
+        <label for="tone">Tone</label>
+        <select id="tone">
+          <option>Playful</option>
+          <option>Bold</option>
+          <option>Elegant</option>
+          <option>Straightforward</option>
+          <option>Witty</option>
+        </select>
+      </div>
+      <div>
+        <label for="platform">Platform</label>
+        <select id="platform">
+          <option>Instagram</option>
+          <option>X / Twitter</option>
+          <option>LinkedIn</option>
+          <option>TikTok</option>
+          <option>Email subject line</option>
+        </select>
+      </div>
+    </div>
+
+    <div>
+      <label for="count">Number of captions — <span class="count-val" id="countVal">3</span></label>
+      <div class="count-row">
+        <input type="range" id="count" min="1" max="8" value="3">
+      </div>
+    </div>
+
+    <button type="submit" class="run" id="runBtn">Generate captions</button>
+  </form>
+
+  <div class="error" id="errorBox"></div>
+  <div class="loading" id="loadingBox">Setting the type…</div>
+
+  <div class="results" id="results">
+    <div class="empty">Your captions will run here once generated.</div>
+  </div>
+
+</div>
+
+<script>
+const form = document.getElementById('genForm');
+const countSlider = document.getElementById('count');
+const countVal = document.getElementById('countVal');
+const resultsBox = document.getElementById('results');
+const errorBox = document.getElementById('errorBox');
+const loadingBox = document.getElementById('loadingBox');
+const runBtn = document.getElementById('runBtn');
+
+countSlider.addEventListener('input', () => {
+  countVal.textContent = countSlider.value;
+});
+
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  errorBox.style.display = 'none';
+
+  const apiKey = document.getElementById('apiKey').value.trim();
+  const product = document.getElementById('product').value.trim();
+  const tone = document.getElementById('tone').value;
+  const platform = document.getElementById('platform').value;
+  const count = countSlider.value;
+
+  if (!apiKey) {
+    showError('Paste a Gemini API key above first.');
+    return;
+  }
+  if (!product) {
+    showError('Tell it what you\'re marketing.');
+    return;
+  }
+
+  runBtn.disabled = true;
+  loadingBox.style.display = 'block';
+  resultsBox.innerHTML = '';
+
+  const prompt = `Write ${count} short, ${tone.toLowerCase()} marketing captions for ${platform}, ` +
+    `advertising: ${product}. Return ONLY the captions, one per line, no numbering, no quotation marks, no extra commentary.`;
+
+  try {
+    const res = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${encodeURIComponent(apiKey)}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }]
+        })
+      }
+    );
+
+    if (!res.ok) {
+      const errData = await res.json().catch(() => null);
+      throw new Error(errData?.error?.message || `Request failed (${res.status})`);
+    }
+
+    const data = await res.json();
+    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+
+    if (lines.length === 0) {
+      throw new Error('No captions came back — try rephrasing the product/service.');
+    }
+
+    renderResults(lines);
+  } catch (err) {
+    showError(err.message || 'Something went wrong calling Gemini.');
+    resultsBox.innerHTML = '<div class="empty">Your captions will run here once generated.</div>';
+  } finally {
+    runBtn.disabled = false;
+    loadingBox.style.display = 'none';
+  }
+});
+
+function renderResults(lines) {
+  resultsBox.innerHTML = '';
+  lines.forEach((line, i) => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.style.animationDelay = (i * 60) + 'ms';
+    card.innerHTML = `
+      <span class="idx">CAPTION ${String(i + 1).padStart(2, '0')}</span>
+      <p>${escapeHtml(line)}</p>
+      <div class="card-foot">
+        <span>${line.length} characters</span>
+        <button class="copy-btn">Copy</button>
+      </div>
+    `;
+    card.querySelector('.copy-btn').addEventListener('click', (ev) => {
+      navigator.clipboard.writeText(line);
+      ev.target.textContent = 'Copied';
+      ev.target.classList.add('copied');
+      setTimeout(() => {
+        ev.target.textContent = 'Copy';
+        ev.target.classList.remove('copied');
+      }, 1400);
+    });
+    resultsBox.appendChild(card);
+  });
+}
+
+function showError(msg) {
+  errorBox.textContent = msg;
+  errorBox.style.display = 'block';
+}
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+</script>
+</body>
+</html>

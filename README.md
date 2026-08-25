@@ -4,14 +4,14 @@ An AI marketing caption generator that started as a 10-line teaching script and 
 
 ## The story
 
-This started as a hands-on exercise I led for the AI in Business Club at ASU — a workshop teaching students how to get a free Google Gemini API key and make their first API call. The original notebook is included in this repo (`AI_Marketing_Captions_Workshop_Personal_.ipynb`): a single Python cell that takes a product name and returns three marketing captions.
+This started as a hands-on exercise I led for the AI in Business Club at ASU — a workshop teaching students what an API is, how to get a free Google Gemini API key and make their first API call. The original notebook is included in this repo (`AI_Marketing_Captions_Workshop_Personal_.ipynb`): a single Python cell that takes a product name and returns three marketing captions.
 
 Afterward, I took that same idea and built it out into a real, deployed application, using the exercise as a jumping-off point to learn the pieces a script like that skips over:
 
 - **Turned the script into a UI** — a browser-based frontend so anyone can use it without touching code, with controls for tone, platform, and caption count.
 - **Identified a security problem in my first version** — the initial build called the Gemini API directly from the browser, which meant the API key was visible to anyone inspecting the page. 
 - **Built a backend to fix it** — added a small FastAPI server in Python that holds the API key server-side and exposes a single endpoint (`/generate-captions`) for the frontend to call instead. The key never reaches the browser.
-- **Debugged the full stack along the way** — including a retired model ID, a Google Cloud project needing the Gemini API explicitly enabled, and Gemini's own transient rate limiting — all while getting comfortable with Git/GitHub for the first time.
+- **Debugged the full stack along the way** — including a retired model ID, a Google Cloud project needing the Gemini API explicitly enabled, and Gemini's own transient rate limiting 
 
 ## Architecture
 

@@ -4,9 +4,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from google import genai
 
-# -------------------------------------------------
 # Load the API key from an environment variable.
-# -------------------------------------------------
+
 API_KEY = os.environ.get("GOOGLE_API_KEY")
 if not API_KEY:
     raise RuntimeError(
@@ -18,26 +17,26 @@ client = genai.Client(api_key=API_KEY)
 
 app = FastAPI()
 
-# -------------------------------------------------
+
 # CORS: by default, a browser blocks a webpage from
 # calling a server on a different address/port than
-# itself. Since yHTML file and this backend run
+# itself. Since HTML file and this backend run
 # on different "origins" while developing, we have to
 # explicitly allow it.
-# -------------------------------------------------
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # fine for local development; we'll tighten this later
+    allow_origins=["*"],  # fine for local dev
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 
-# -------------------------------------------------
-# This defines the SHAPE of the request the frontend
+
+# defines SHAPE of the request the frontend
 # will send us. FastAPI uses this to automatically
 # validate incoming requests.
-# -------------------------------------------------
+
 class CaptionRequest(BaseModel):
     product: str
     tone: str
@@ -45,12 +44,12 @@ class CaptionRequest(BaseModel):
     count: int
 
 
-# -------------------------------------------------
+
 # The endpoint itself. "@app.post" means: when a POST
 # request arrives at /generate-captions, run this
 # function. This replaces the fetch() call that used
 # to go straight to Gemini from the browser.
-# -------------------------------------------------
+
 @app.post("/generate-captions")
 def generate_captions(req: CaptionRequest):
     prompt = (
@@ -77,10 +76,10 @@ def generate_captions(req: CaptionRequest):
     return {"captions": lines}
 
 
-# -------------------------------------------------
+
 # A simple health check, useful for confirming the
 # server is up before wiring the frontend to it.
-# -------------------------------------------------
+
 @app.get("/")
 def root():
     return {"status": "caption generator backend is running"}

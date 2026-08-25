@@ -267,15 +267,10 @@ button.run:disabled{ background:#b6ab93; cursor:not-allowed; }
   </header>
 
   <div class="setup-note">
-    Paste a Gemini API key to run this (free at <a href="https://aistudio.google.com/app/apikey" target="_blank">aistudio.google.com/app/apikey</a>). The key stays in this browser tab only — it's never saved or sent anywhere but Google.
+    Running against a local backend at <code>127.0.0.1:8000</code> — no key needed in the browser.
   </div>
 
   <form id="genForm">
-    <div>
-      <label for="apiKey">Gemini API key</label>
-      <input type="password" id="apiKey" placeholder="AIza...">
-    </div>
-
     <div>
       <label for="product">Product or service</label>
       <input type="text" id="product" placeholder="e.g. a cold brew coffee subscription" required>
@@ -340,16 +335,11 @@ form.addEventListener('submit', async (e) => {
   e.preventDefault();
   errorBox.style.display = 'none';
 
-  const apiKey = document.getElementById('apiKey').value.trim();
   const product = document.getElementById('product').value.trim();
   const tone = document.getElementById('tone').value;
   const platform = document.getElementById('platform').value;
   const count = countSlider.value;
 
-  if (!apiKey) {
-    showError('Paste a Gemini API key above first.');
-    return;
-  }
   if (!product) {
     showError('Tell it what you\'re marketing.');
     return;
@@ -359,29 +349,20 @@ form.addEventListener('submit', async (e) => {
   loadingBox.style.display = 'block';
   resultsBox.innerHTML = '';
 
-  const prompt = `Write ${count} short, ${tone.toLowerCase()} marketing captions for ${platform}, ` +
-    `advertising: ${product}. Return ONLY the captions, one per line, no numbering, no quotation marks, no extra commentary.`;
-
   try {
-    const res = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${encodeURIComponent(apiKey)}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }]
-        })
-      }
-    );
+    const res = await fetch('http://127.0.0.1:8000/generate-captions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ product, tone, platform, count: Number(count) })
+    });
 
     if (!res.ok) {
       const errData = await res.json().catch(() => null);
-      throw new Error(errData?.error?.message || `Request failed (${res.status})`);
+      throw new Error(errData?.detail || `Request failed (${res.status})`);
     }
 
     const data = await res.json();
-    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
-    const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+    const lines = data.captions || [];
 
     if (lines.length === 0) {
       throw new Error('No captions came back — try rephrasing the product/service.');

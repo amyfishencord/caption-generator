@@ -1,69 +1,46 @@
-# 🤖 AI Job Application Agent
-### ASU AI in Business Club Workshop
+# Caption Press
 
-A Streamlit web app that acts as an AI agent to help you tailor your resume and generate cover letters for any job posting.
+An AI marketing caption generator that started as a 10-line teaching script and became a small full-stack app.
 
----
+## The story
 
-## 🚀 How to Run This App
+This started as a hands-on exercise I led for the AI in Business Club at ASU — a workshop teaching students how to get a free Google Gemini API key and make their first API call. The original notebook is included in this repo (`AI_Marketing_Captions_Workshop_Personal_.ipynb`): a single Python cell that takes a product name and returns three marketing captions.
 
-### Option 1: Run Locally (Recommended for Workshop)
+Afterward, I took that same idea and built it out into a real, deployed application, using the exercise as a jumping-off point to learn the pieces a script like that skips over:
 
-1. **Make sure Python is installed**
-   - Download from python.org if needed
+- **Turned the script into a UI** — a browser-based frontend so anyone can use it without touching code, with controls for tone, platform, and caption count.
+- **Identified a security problem in my first version** — the initial build called the Gemini API directly from the browser, which meant the API key was visible to anyone inspecting the page. 
+- **Built a backend to fix it** — added a small FastAPI server in Python that holds the API key server-side and exposes a single endpoint (`/generate-captions`) for the frontend to call instead. The key never reaches the browser.
+- **Debugged the full stack along the way** — including a retired model ID, a Google Cloud project needing the Gemini API explicitly enabled, and Gemini's own transient rate limiting — all while getting comfortable with Git/GitHub for the first time.
 
-2. **Install the required libraries**
-   Open your terminal and run:
-   ```
-   pip install streamlit google-generativeai PyPDF2 requests beautifulsoup4
-   ```
+## Architecture
 
-3. **Run the app**
-   Navigate to the folder where app.py is saved, then run:
-   ```
-   streamlit run app.py
-   ```
-   The app will open automatically in your browser at http://localhost:8501
+```
+Frontend (HTML/CSS/JS)  →  Backend (FastAPI, Python)  →  Gemini API
+   caption-generator.html         main.py
+```
 
----
+## Running it locally
 
-### Option 2: Deploy Free on Streamlit Cloud (Share with the whole club)
+**1. Install backend dependencies:**
+```
+pip3 install -r requirements.txt
+```
 
-1. Upload app.py and requirements.txt to a GitHub repository
-2. Go to share.streamlit.io
-3. Connect your GitHub repo
-4. Deploy — you get a public URL to share with everyone!
+**2. Set your Gemini API key** (get one free at [aistudio.google.com/app/apikey](https://aistudio.google.com/app/apikey)):
+```
+export GOOGLE_API_KEY="your_key_here"
+```
 
----
+**3. Start the backend:**
+```
+uvicorn main:app --reload
+```
 
-## 🔑 Getting Your Free Gemini API Key
+**4. Open `caption-generator.html`** in your browser. It talks to the backend at `http://127.0.0.1:8000`.
 
-1. Go to aistudio.google.com
-2. Sign in with your Google account
-3. Click "Get API Key"
-4. Create a new key — it's completely free!
+## What I'd do next
 
----
-
-## 💡 What the Agent Does
-
-1. **Accepts your resume** as a PDF upload
-2. **Scrapes the job posting** from a URL automatically
-3. **Asks you follow-up questions** to personalize the output
-4. **Generates:**
-   - Match score with strengths and gaps
-   - 6 tailored resume bullet points
-   - 3 different cover letter versions (different tones)
-5. **Lets you download** everything
-
----
-
-## 🛠 Tech Stack
-- Python
-- Streamlit (web app framework)
-- Google Gemini API (AI)
-- PyPDF2 (PDF reading)
-- BeautifulSoup (web scraping)
-
----
-*Built for ASU AI in Business Club*
+- Add authentication and rate limiting before letting this run publicly
+- Persist generated captions to a database
+- Deploy the backend somewhere reachable outside localhost (e.g. Render/Railway) instead of running it locally
